@@ -3,7 +3,7 @@
 '''
 This script was heavily inspired by jamJAR. While a few dozen or so lines were coppied
 directly from it, the intention is very different. This script has no notification
-capabilities and can add or remove items from any section of a local munki client
+capabilities and can add or remove items from any valid section of a local munki client
 manifest.
 
 It is highly experimental, and not used in production. (yet?)
@@ -66,9 +66,8 @@ def get_action():
             print(f'Action must be one of: {actions}.')
             sys.exit(4)
 
-        sections = ['catalogs', 'included_manifests', 'managed_installs',
-                    'managed_uninstalls', 'optional_installs', 'managed_updates',
-                    'default_installs', 'conditional_items']
+        sections = ['managed_installs', 'managed_uninstalls',
+                    'optional_installs', 'managed_updates']
         if section not in sections:
             print(f'Section must be one of: {sections}.')
             sys.exit(4)
