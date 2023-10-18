@@ -34,16 +34,24 @@ if MANAGED_INSTALL_DIR is None:
     # sys.exit(1)
 
 # Make sure a LocalOnlyManifest is specified, exit if not declared
-MANIFEST_FILE = CFPreferencesCopyAppValue('LocalOnlyManifest', 'ManagedInstalls')
-if MANIFEST_FILE is None:
+MANIFEST = CFPreferencesCopyAppValue('LocalOnlyManifest', 'ManagedInstalls')
+if MANIFEST is None:
     print("ERROR: No LocalOnlyManifest declared...")
     # sys.exit(1)
 
-MANIFEST_PATH = f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST_FILE}'
+MANIFEST_PATH = f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}'
 
 
 def get_manifest():
-    return FoundationPlist.readPlist(f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST_FILE}')
+    if os.path.exists(f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}'):
+        # If LocalOnlyManifest exists, try to read it
+        try:
+            return FoundationPlist.readPlist(f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}')
+        except FoundationPlist.NSPropertyListSerializationException:
+            print("ERROR: Cannot read f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}")
+            sys.exit(1)
+
+    return {}
 
 def get_action():
     '''Check parameter 4 for section.action'''
@@ -106,11 +114,11 @@ def check_forced():
 def update_client_manifest(section, items, action):
     '''
         Perform the <action> on the <items> in the <section> of the LocalOnlyManifest.
-        Writes the new manifest to disk and returns processed_items, skipped_items
+        Writes the new manifest to disk and returns two lists: processed_items, skipped_items
     '''
 
     original_manifest = get_manifest()
-    original_manifest_items = set(original_manifest[section])
+    original_manifest_items = set(original_manifest.get(section, []))
     action_items = set(items)
     unique_items = action_items - original_manifest_items
     common_items = action_items.intersection(original_manifest_items)
@@ -141,7 +149,7 @@ def update_client_manifest(section, items, action):
         # Write to disk
         FoundationPlist.writePlist(new_manifest, MANIFEST_PATH)
     
-    return processed_items, skipped_items
+    return processed_items or [], skipped_items or []
 
 def run_managedsoftwareupdate(forced=None):
     '''
@@ -172,18 +180,9 @@ if __name__ == "__main__":
     force_mode = check_forced()
     processed, skipped = update_client_manifest(section, action_items, action)
 
-    result = {'processed': processed,
-              'skipped': skipped}
+    result = {'processed': list(processed),
+              'skipped': list(skipped)}
 
     run_managedsoftwareupdate(forced=force_mode)
 
     print(json.dumps(result))
-
-
-
-
-
-
-
-
-
