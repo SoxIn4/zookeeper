@@ -8,6 +8,7 @@ Zookeeper was heavily inspired by jamJar as an attempt to use the best parts of 
 This will let us take full advantage of everything munki has to offer and reduce clutter in users' self help options by separating software installs in MSC from company resources and support in Self-Service.
 
 ## Usage
+This assumes you have a working munki environment!
 
 1. Copy the script to your jamf instance.
 2. Set parameter labels
