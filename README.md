@@ -19,4 +19,4 @@ This will let us take full advantage of everything munki has to offer and reduce
 # Work in progress
 This is very experimental and untested. We're in the process of building a fresh jamf environment after being away for 10+ years. This script will evolve as we move on and learn more.
 
-If you're crazy enough to want to try this out now, please reach out with feedback to SoxIn4 in the Mac Admins' Slack.
+If you're crazy enough to want to try this out now, please reach out with feedback to SoxIn4 in the Mac Admins' Slack or post an issue here.
