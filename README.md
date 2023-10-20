@@ -3,7 +3,7 @@ Zookeeper
 
 ## Introduction
 
-Zookeeper was heavily inspired by jamJar as an attempt to use the best parts of both tools. I'm writing this to use in a fresh jamf instance, so I have not considered at all how this might be added to a live environment. Besides being able to add or remove items from any valid section (`['managed_installs', 'managed_uninstalls', 'optional_installs', 'managed_updates']`) of a client's local manifest, zookeeper will not provide additional notification capabilities, and it encourages the use of Managed Software Center for users to install optional apps.
+Zookeeper was heavily inspired by jamJar as an attempt to use the best parts of Munki and Jamf. Basically, I wanted to use JAMF's fantastic scoping abilities to power Munki's unmatched sotware provisioning capabilities. I'm writing this to use in a fresh jamf instance, so I have not considered at all how this might be merged into to a live environment. Besides being able to add or remove items from any valid section (`['managed_installs', 'managed_uninstalls', 'optional_installs', 'managed_updates']`) of a client's local manifest, zookeeper will not provide additional notification capabilities, and it encourages the use of Managed Software Center for users to install optional apps.
 
 This will let us take full advantage of everything munki has to offer and reduce clutter in users' self help options by separating software installs in MSC from company resources and support in Self-Service.
 
@@ -18,5 +18,7 @@ This will let us take full advantage of everything munki has to offer and reduce
 
 # Work in progress
 This is very experimental and untested. We're in the process of building a fresh jamf environment after being away for 10+ years. This script will evolve as we move on and learn more.
+
+We're kicking around ideas to support vpp apps via munki self service, thought and ideas welcome!
 
 If you're crazy enough to want to try this out now, please reach out with feedback to SoxIn4 in the Mac Admins' Slack or post an issue here.
