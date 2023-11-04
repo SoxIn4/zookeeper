@@ -48,7 +48,7 @@ def get_manifest():
         try:
             return FoundationPlist.readPlist(f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}')
         except FoundationPlist.NSPropertyListSerializationException:
-            print("ERROR: Cannot read f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}")
+            print(f'ERROR: Cannot read {MANAGED_INSTALL_DIR}/manifests/{MANIFEST}')
             sys.exit(1)
 
     return {}
