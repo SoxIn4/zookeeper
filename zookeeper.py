@@ -192,7 +192,7 @@ if __name__ == "__main__":
             action_items = command[section][action]
             print(f'{section}-{action}-{action_items}')
             processed, skipped = update_client_manifest(section, action_items, action)
-            print(f'{processed}, {skipped}')
+            print(f'Processed: {processed}, Skipped: {skipped}')
             new_section = result.get(section, {})
             if processed:
                 existing = new_section.get(action, [])
