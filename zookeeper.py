@@ -28,18 +28,26 @@ except ImportError:
     sys.exit(1)
 
 
+FORMAT = '{section: {action1: ["app", "list"], action2: ["app"]}}'
+SECTIONS = ['managed_installs', 'managed_uninstalls',
+            'optional_installs', 'managed_updates']
+ACTIONS = ['add', 'remove']
+
 MANAGED_INSTALL_DIR = CFPreferencesCopyAppValue('ManagedInstallDir', 'ManagedInstalls')
 if MANAGED_INSTALL_DIR is None:
     print('ERROR: Cannot get Managed Installs directory...')
-    # sys.exit(1)
+    sys.exit(1)
 
 # Make sure a LocalOnlyManifest is specified, exit if not declared
 MANIFEST = CFPreferencesCopyAppValue('LocalOnlyManifest', 'ManagedInstalls')
 if MANIFEST is None:
     print("ERROR: No LocalOnlyManifest declared...")
-    # sys.exit(1)
+    sys.exit(1)
 
 MANIFEST_PATH = f'{MANAGED_INSTALL_DIR}/manifests/{MANIFEST}'
+# MANAGED_INSTALL_DIR = '/Library/Managed Installs'
+# MANIFEST = 'LocalOnlyManifest'
+# MANIFEST_PATH = f'/Library/Managed Installs/manifests/LocalOnlyManifest'
 
 
 def get_manifest():
@@ -53,49 +61,40 @@ def get_manifest():
 
     return {}
 
-def get_action():
-    '''Check parameter 4 for section.action'''
+def get_commands():
+    '''
+    Check parameters 4-10 for
+    {section: {action1: ["app", "list"], action2: ["app"]}}
+    '''
 
-    try:
-        arg_4 = sys.argv[4]
-    except IndexError:
-        print('Parameter 4 not set, must provide section.action')
-        sys.exit(4)
+    commands = []
+    for arg in sys.argv[4:11]:
+        if arg:
+            try:
+                command = json.loads(arg)
+                try:
+                    if len(command) != 1:
+                        print(f'Command: "{command}" not formatted correctly.\n'
+                              'Must have 1 section with at least 1 action '
+                              'with a list with at least 1 app.\n'
+                              f'Expected format: {FORMAT}')
+                        sys.exit(1)
+                except TypeError as error:
+                    print(f'{command_error}\n{error}')
+                    sys.exit(1)
+                section = list(command.keys())[0]
+                if section not in SECTIONS:
+                    print(f'{section} not a valid section.\n'
+                          'Section must be one of: {SECTIONS}.\n'
+                          f'Expected format: {FORMAT}')
+                    sys.exit(1)
+                commands.append(command)
 
-    if arg_4:
-        try:
-          section, action = arg_4.split('.')
-        except ValueError:
-            print('Parameter 4 must be in the form section.action.')
-            sys.exit(4)
-
-        actions = ['add', 'remove']
-        if action not in actions:
-            print(f'Action must be one of: {actions}.')
-            sys.exit(4)
-
-        sections = ['managed_installs', 'managed_uninstalls',
-                    'optional_installs', 'managed_updates']
-        if section not in sections:
-            print(f'Section must be one of: {sections}.')
-            sys.exit(4)
-
-        return section, action
-
-def get_action_items():
-    '''Check parameter 5 and return a list of items to add or remove.'''
-
-    try:
-        items = sys.argv[5]
-    except IndexError:
-        print('Parameter 5 not set, must provide item(s)')
-        sys.exit(5)
-
-    # if not items:
-    #     print('No items to act on.')
-    #     sys.exit(5)
-
-    return [item.strip() for item in items.split(',')]
+            except json.decoder.JSONDecodeError as error:
+                print(f'Arg: {arg} not formatted correctly.\n'
+                      f'Expected format: {FORMAT}\n{error}')
+                sys.exit(1)
+    return commands
 
 def check_forced():
     '''Check if parameter 11 is set to 'ENGAGE' and return boolean.'''
@@ -124,7 +123,8 @@ def update_client_manifest(section, items, action):
     common_items = action_items.intersection(original_manifest_items)
 
     new_manifest = dict(original_manifest)
-    processed_items = None
+    processed_items, skipped_items = None, None
+   
     match action:
         case 'add':
             skipped_items = common_items
@@ -144,11 +144,16 @@ def update_client_manifest(section, items, action):
                 processed_items = common_items
             else:
                 print(f'Nothing to remove. {items} not in {section}')
+        case '*':
+            print(f'Action must be one of: {ACTIONS}.')
+            sys.exit(4)
 
     if processed_items:
         # Write to disk
         FoundationPlist.writePlist(new_manifest, MANIFEST_PATH)
-    
+        processed_items = list(processed_items)
+    if skipped_items:
+        skipped_items = list(skipped_items)
     return processed_items or [], skipped_items or []
 
 def run_managedsoftwareupdate(forced=None):
@@ -174,14 +179,28 @@ if __name__ == "__main__":
     if os.geteuid() != 0:
         print('ERROR: This script must be run as root')
         sys.exit(1)
-    # Process the parameters
-    section, action = get_action()
-    action_items = get_action_items()
-    force_mode = check_forced()
-    processed, skipped = update_client_manifest(section, action_items, action)
 
-    result = {'processed': list(processed),
-              'skipped': list(skipped)}
+    # Process the parameters
+    force_mode = check_forced()
+    commands = get_commands()
+
+    result = {}
+    for command in commands:
+        section = list(command.keys())[0]
+        actions = list(command[section].keys())
+        for action in actions:
+            action_items = command[section][action]
+            print(f'{section}-{action}-{action_items}')
+            processed, skipped = update_client_manifest(section, action_items, action)
+            print(f'{processed}, {skipped}')
+            new_section = result.get(section, {})
+            if processed:
+                existing = new_section.get(action, [])
+                new_section[action] = existing + processed
+            if skipped:
+                existing = new_section.get('skipped', [])
+                new_section['skipped'] = existing + skipped
+            result[section] = new_section
 
     run_managedsoftwareupdate(forced=force_mode)
 
