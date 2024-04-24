@@ -10,9 +10,15 @@ except ImportError:
     print('ERROR: Cannot import FoundationPlist')
     sys.exit(1)
 
-CONFGDIR = '/usr/local/matw/config'
-FILES = {'groups.plist': {'sections': ['Entra_AD_Groups']},
-         'file2': True}
+# Set a path to store the plists
+CONFGDIR = '/usr/local/company_name/config'
+
+# Edit this to reflect your needs
+FILES = {'groups': {'sections': ['idp_groups', 'jamf_groups']},
+         'tags': {'sections': ['device_tags', 'user_tags']}}
+
+if not os.path.exists(CONFGDIR):
+    os.makedirs(CONFGDIR)
 
 def get_command():
     '''Check parameter 4 for file.section.action'''
@@ -30,28 +36,25 @@ def get_command():
         print(f'{format_message}')
         sys.exit(4)
 
-    filename = f'{file}.plist'
-    if f'{filename}' not in FILES:
-        # errors.append(f'Invalid file. Must be one of: {list(FILES.keys())}.')
+    # filename = f'{file}.plist'
+    if f'{file}' not in FILES:
         print(f'Invalid file. Must be one of: {list(FILES.keys())}.')
         sys.exit(4)
     errors = []
-    sections = FILES[filename]['sections']
+    sections = FILES[file]['sections']
     if section not in sections:
         errors.append(f'Section must be one of: {sections}.')
-        # print(f'Section must be one of: {sections}.')
-        # sys.exit(4)
+
     actions = ['add', 'remove']
     if action not in actions:
         errors.append(f'Action must be one of: {actions}.')
-        # print(f'Action must be one of: {actions}.')
-        # sys.exit(4)
+
     if errors:
         message = "\n".join(errors)
         print(f'{message}\n')
         sys.exit(4)
 
-    return filename, section, action
+    return f'{file}.plist', section, action
 
 def get_action_items():
     '''Check parameter 5 and return a list of items to add or remove.'''
@@ -126,8 +129,8 @@ if __name__ == "__main__":
     # Process the parameters
     filename, section, action = get_command()
     action_items = get_action_items()
-    # force_mode = check_forced()
-    # TODO 
+
+    # execute actions
     processed, skipped = update_plist(filename, section, action_items, action)
 
     result = {'processed': list(processed),

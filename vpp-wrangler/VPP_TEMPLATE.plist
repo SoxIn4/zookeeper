@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>development</string>
+	</array>
+	<key>display_name</key>
+	<string>FindAndReplaceAllWithAppName</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/local/munki/munki-python
+import os
+import sys
+
+sys.path.append('/usr/local/munki')
+try:
+    from munkilib import FoundationPlist
+except ImportError:
+    print('ERROR: Cannot import FoundationPlist')
+    sys.exit(1)
+
+# Replace all instances of FindAndReplaceAllWithAppName with the app name
+# Copy from your MDM or get the name as it appears on disk, minus ".app"
+target = 'FindAndReplaceAllWithAppName'
+
+# Edit path for your environment
+vpp_list_dir = '/usr/local/company_name/config'
+vpp_list_path = f'{vpp_list_dir}/vpp_apps.plist'
+
+if os.path.exists(vpp_list_path):
+    try:
+        vpp_apps_plist =  FoundationPlist.readPlist(vpp_list_path)
+    except FoundationPlist.NSPropertyListSerializationException:
+        print(f'ERROR: Cannot read {vpp_list_path}')
+        sys.exit(1)
+
+    apps = vpp_apps_plist['apps']
+    if target in apps:
+        print(f'{target} is already in the vpp list, nothing to do')
+        sys.exit(1)
+
+print(f'{target} is not in vpp list yet')
+sys.exit(0)
+</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>13.0</string>
+	<key>name</key>
+	<string>VPPTemplate</string>
+	<key>postinstall_script</key>
+	<string>#!/usr/local/munki/munki-python
+import os
+import sys
+
+sys.path.append('/usr/local/munki')
+try:
+    from munkilib import FoundationPlist
+except ImportError:
+    print('ERROR: Cannot import FoundationPlist')
+    sys.exit(1)
+
+
+# Replace all instances of FindAndReplaceAllWithAppName with the app name
+# Copy from your MDM or get the name as it appears on disk, minus ".app"
+target = 'FindAndReplaceAllWithAppName'
+
+# Edit path for your environment
+vpp_list_dir = '/usr/local/company_name/config'
+vpp_list_path = f'{vpp_list_dir}/vpp_apps.plist'
+vpp_apps_plist = None
+
+if os.path.exists(vpp_list_path):
+    try:
+        vpp_apps_plist =  FoundationPlist.readPlist(vpp_list_path)
+        if target in vpp_apps_plist['apps']:
+            print(f'{target} is already in the vpp list, nothing to do')
+            sys.exit(0)
+        else:
+            vpp_apps_plist['apps'].append(target)
+    except FoundationPlist.NSPropertyListSerializationException:
+        print(f'ERROR: Cannot read {vpp_list_path}')
+        sys.exit(1)
+
+if not vpp_apps_plist:
+    vpp_apps_plist = {'apps': [target]}
+
+if not os.path.exists(vpp_list_dir):
+    os.makedirs(vpp_list_dir)
+FoundationPlist.writePlist(vpp_apps_plist, vpp_list_path)
+print(f'{target} added to vpp list at {vpp_list_path}')
+</string>
+	<key>postuninstall_script</key>
+	<string>#!/bin/zsh
+app='/Applications/FindAndReplaceAllWithAppName.app'
+rm -rf $app</string>
+	<key>preinstall_alert</key>
+	<dict>
+		<key>alert_detail</key>
+		<string>FindAndReplaceAllWithAppName should show up in your Applications folder within the next 30 minutes.
+
+This application will be installed through the Apple AppStore in the background. AppStore apps can take longer than others to install, and do not provide progress updates.</string>
+		<key>alert_title</key>
+		<string>FindAndReplaceAllWithAppName Install</string>
+	</dict>
+	<key>preuninstall_alert</key>
+	<dict>
+		<key>alert_detail</key>
+		<string>FindAndReplaceAllWithAppName should be removed from your Applications folder within the next 30 minutes.
+
+This application was installed through the Apple AppStore. AppStore apps can take longer than others to remove, and do not provide progress updates.</string>
+	</dict>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/usr/local/munki/munki-python
+import os
+import sys
+
+sys.path.append('/usr/local/munki')
+try:
+    from munkilib import FoundationPlist
+except ImportError:
+    print('ERROR: Cannot import FoundationPlist')
+    sys.exit(1)
+
+
+# Replace all instances of FindAndReplaceAllWithAppName with the app name
+# Copy from your MDM or get the name as it appears on disk, minus ".app"
+target = 'FindAndReplaceAllWithAppName'
+
+
+# Edit path for your environment
+vpp_list_dir = '/usr/local/company_name/config'
+vpp_list_path = f'{vpp_list_dir}/vpp_apps.plist'
+
+if os.path.exists(vpp_list_path):
+    try:
+        vpp_apps_plist =  FoundationPlist.readPlist(vpp_list_path)
+    except FoundationPlist.NSPropertyListSerializationException:
+        print(f'ERROR: Cannot read {vpp_list_path}')
+        sys.exit(1)
+
+    if target in vpp_apps_plist['apps']:
+        vpp_apps_plist['apps'].remove(target)
+        FoundationPlist.writePlist(vpp_apps_plist, vpp_list_path)
+        print(f'{target} removed from {vpp_list_path}')
+        sys.exit(0)
+   
+print(f'{target} not in {vpp_list_path}, nothing to do')
+</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>uninstallcheck_script</key>
+	<string>#!/bin/zsh
+app='/Applications/FindAndReplaceAllWithAppName.app'
+if [[ ! -d $app ]]; then
+	exit 1
+fi
+
+echo $app is installed, uninstalling
+</string>
+	<key>version</key>
+	<string>vpp</string>
+</dict>
+</plist>
