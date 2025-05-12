@@ -1,4 +1,5 @@
 #!/usr/local/munki/munki-python
+
 import json
 import os
 import sys
@@ -13,6 +14,9 @@ except ImportError:
 # Set a path to store the plists
 CONFGDIR = '/usr/local/company_name/config'
 
+# Define the files and sections to be edited
+# The keys in the FILES dictionary are the plist filenames
+# The values are dictionaries with a 'sections' key that contains a list of sections
 # Edit this to reflect your needs
 FILES = {'groups': {'sections': ['idp_groups', 'jamf_groups']},
          'tags': {'sections': ['device_tags', 'user_tags']}}
@@ -36,15 +40,20 @@ def get_command():
         print(f'{format_message}')
         sys.exit(4)
 
-    # filename = f'{file}.plist'
-    if f'{file}' not in FILES:
+    # Check if the file is valid
+    filename = f'{file}.plist'
+    if f'{filename}' not in FILES:
+        # errors.append(f'Invalid file. Must be one of: {list(FILES.keys())}.')
         print(f'Invalid file. Must be one of: {list(FILES.keys())}.')
         sys.exit(4)
+        
     errors = []
-    sections = FILES[file]['sections']
+    # Check if the section is valid
+    sections = FILES[filename]['sections']
     if section not in sections:
         errors.append(f'Section must be one of: {sections}.')
 
+    # Check if the action is valid
     actions = ['add', 'remove']
     if action not in actions:
         errors.append(f'Action must be one of: {actions}.')
@@ -54,7 +63,7 @@ def get_command():
         print(f'{message}\n')
         sys.exit(4)
 
-    return f'{file}.plist', section, action
+    return filename, section, action
 
 def get_action_items():
     '''Check parameter 5 and return a list of items to add or remove.'''
