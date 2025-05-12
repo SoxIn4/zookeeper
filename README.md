@@ -51,10 +51,10 @@ Jamf setup:
 Munki setup:
 
 1. Duplicate and rename VPP_TEMPLATE.plist
-2. Find and replace all occurrences of `FindAndReplaceAllWithAppName` with the app's display name you copied from Jamf above.
+2. Find and replace all occurrences of `APPNAME` with the app's display name you copied from Jamf above.
 3. Find and edit all instances of `vpp_list_dir = '/usr/local/company_name/config'`
-4. Edit the name key in line 53
-5. Edit the catalog in line 9 if needed
+4. Edit the name key in line 21
+5. Add a catalog(s) at line 19 if needed
 6. Import the new pkginfo file to your munki repo
 7. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
 

@@ -2,14 +2,29 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>soxin4</string>
+		<key>creation_date</key>
+		<date>2023-10-24T21:10:19Z</date>
+		<key>munki_version</key>
+		<string>6.3.3.4593</string>
+		<key>os_version</key>
+		<string>14.0</string>
+	</dict>
 	<key>autoremove</key>
 	<false/>
 	<key>catalogs</key>
-	<array>
-		<string>development</string>
-	</array>
+	<array/>
+	<key>name</key>
+	<string>VPPTemplate</string>
+	<key>description</key>
+	<string></string>
+	<key>developer</key>
+	<string>Microsoft</string>
 	<key>display_name</key>
-	<string>FindAndReplaceAllWithAppName</string>
+	<string>APPNAME</string>
 	<key>installcheck_script</key>
 	<string>#!/usr/local/munki/munki-python
 import os
@@ -22,13 +37,11 @@ except ImportError:
     print('ERROR: Cannot import FoundationPlist')
     sys.exit(1)
 
-# Replace all instances of FindAndReplaceAllWithAppName with the app name
-# Copy from your MDM or get the name as it appears on disk, minus ".app"
-target = 'FindAndReplaceAllWithAppName'
 
-# Edit path for your environment
+target = 'APPNAME'
 vpp_list_dir = '/usr/local/company_name/config'
-vpp_list_path = f'{vpp_list_dir}/vpp_apps.plist'
+vpp_list_name = 'vpp_apps'
+vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 
 if os.path.exists(vpp_list_path):
     try:
@@ -49,8 +62,6 @@ sys.exit(0)
 	<string>nopkg</string>
 	<key>minimum_os_version</key>
 	<string>13.0</string>
-	<key>name</key>
-	<string>VPPTemplate</string>
 	<key>postinstall_script</key>
 	<string>#!/usr/local/munki/munki-python
 import os
@@ -64,13 +75,10 @@ except ImportError:
     sys.exit(1)
 
 
-# Replace all instances of FindAndReplaceAllWithAppName with the app name
-# Copy from your MDM or get the name as it appears on disk, minus ".app"
-target = 'FindAndReplaceAllWithAppName'
-
-# Edit path for your environment
+target = 'APPNAME'
 vpp_list_dir = '/usr/local/company_name/config'
-vpp_list_path = f'{vpp_list_dir}/vpp_apps.plist'
+vpp_list_name = 'vpp_apps'
+vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 vpp_apps_plist = None
 
 if os.path.exists(vpp_list_path):
@@ -95,21 +103,21 @@ print(f'{target} added to vpp list at {vpp_list_path}')
 </string>
 	<key>postuninstall_script</key>
 	<string>#!/bin/zsh
-app='/Applications/FindAndReplaceAllWithAppName.app'
+app='/Applications/APPNAME.app'
 rm -rf $app</string>
 	<key>preinstall_alert</key>
 	<dict>
 		<key>alert_detail</key>
-		<string>FindAndReplaceAllWithAppName should show up in your Applications folder within the next 30 minutes.
+		<string>APPNAME should show up in your Applications folder within the next 30 minutes.
 
 This application will be installed through the Apple AppStore in the background. AppStore apps can take longer than others to install, and do not provide progress updates.</string>
 		<key>alert_title</key>
-		<string>FindAndReplaceAllWithAppName Install</string>
+		<string>APPNAME Install</string>
 	</dict>
 	<key>preuninstall_alert</key>
 	<dict>
 		<key>alert_detail</key>
-		<string>FindAndReplaceAllWithAppName should be removed from your Applications folder within the next 30 minutes.
+		<string>APPNAME should be removed from your Applications folder within the next 30 minutes.
 
 This application was installed through the Apple AppStore. AppStore apps can take longer than others to remove, and do not provide progress updates.</string>
 	</dict>
@@ -132,14 +140,10 @@ except ImportError:
     sys.exit(1)
 
 
-# Replace all instances of FindAndReplaceAllWithAppName with the app name
-# Copy from your MDM or get the name as it appears on disk, minus ".app"
-target = 'FindAndReplaceAllWithAppName'
-
-
-# Edit path for your environment
+target = 'APPNAME'
 vpp_list_dir = '/usr/local/company_name/config'
-vpp_list_path = f'{vpp_list_dir}/vpp_apps.plist'
+vpp_list_name = 'vpp_apps'
+vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 
 if os.path.exists(vpp_list_path):
     try:
@@ -155,12 +159,13 @@ if os.path.exists(vpp_list_path):
         sys.exit(0)
    
 print(f'{target} not in {vpp_list_path}, nothing to do')
+
 </string>
 	<key>uninstallable</key>
 	<true/>
 	<key>uninstallcheck_script</key>
 	<string>#!/bin/zsh
-app='/Applications/FindAndReplaceAllWithAppName.app'
+app='/Applications/APPNAME.app'
 if [[ ! -d $app ]]; then
 	exit 1
 fi
