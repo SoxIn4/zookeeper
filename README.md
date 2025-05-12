@@ -14,6 +14,8 @@ They make it easier to start using munki on a large scale without needing to con
 
 This must be installed on your clients as a munki postflight script.
 While most of the stuff int his repo can work independently of one another, almost everything here depends on the postflight script.
+If you're already using a postflight sctipt that runs scripts from a postflight.d dir, you can drom the recon.sh script in there. If you don't have a postinstall script, use the one provided.
+(both scripts afre identical)
 It will run a jamf recon whenever munki has installed or removed anything to keep jamf up to date.
 
 ### edit_config_values.py
