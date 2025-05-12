@@ -12,30 +12,9 @@ They make it easier to start using munki on a large scale without needing to con
 
 ### munki_postflight_recon.sh
 
-Install this on your clients as a munki postflight script.
+This must be installed on your clients as a munki postflight script.
+While most of the stuff int his repo can work independently of one another, almost everything here depends on the postflight script.
 It will run a jamf recon whenever munki has installed or removed anything to keep jamf up to date.
-
-### Zookeeper.py
-
-This is an easy way to get started using Munki with Jamf, especially if you've just setup your first munki repo. You can get started with this without setting up any manifests in your munki repo (you will need installers, and catalogs though).
-
-Zookeeper's basic function is to add or remove items from any valid section (`['managed_installs', 'managed_uninstalls', 'optional_installs', 'managed_updates']`) of a client's local manifest.
-
-With the other pieces in place, we've mostly stopped relying on this script altogether, but it was an essential stepping stone to help figure out how to fit both tools into our environment and get the most out of them. It let us start with a single unimportant app to get a feel for things before we moved to a manifest based approach levraging a single standard manifest for most of our fleet with a lot of conditional included manifests that fuction very similarly to smart groups in an abstract sense.
-
-Setup script in Jamf:
-
-1. Copy the script to your jamf instance.
-2. Set parameter labels
-    1. Parameter 4: `Section.Action (Action must be *add* or *remove*)`
-    2. Parameter 5: `Items (One or more separated by commas)`
-    3. Parameter 11: `Force Mode`
-
-Use in profiles:
-
-1. Add zookeeper script to a profile
-2. In parameter 4, add the manifests section and action. Example: `managed_installs.add`
-3. In parameter 5 add the name of the item(s) exactly as it appears in the name key in its pkginfo file.
 
 ### edit_config_values.py
 
@@ -54,6 +33,28 @@ Use in profiles:
 1. Add edit_config_values script to a profile
 2. In parameter 4, add the file, section, and action. Example: `tags.device_tags.add`
 3. In parameter 5 add the value(s). Example: `Tag1, Tag 2, Tag_3`
+
+### vpp-wrangler
+
+All of the scripts here except the ea script are part of the VPP_TEMPLATE.plist.
+You can use the template to creat pkginfo files for vpp apps to be offered in MSC and delivered via VPP. Basically, when a user chooses to install a vpp app in MSC, munki will write the app name to a plist. Jamf will read the list of vpp apps into an ea, which is used to create smartgroups scoped to deploy the app.
+
+Jamf setup:
+
+1. Create a new EA with vpp_triggers_ea.py
+2. Copy the display name of an App Store app from the Mac Apps section of your console
+3. Create a smart group with the criteria: vpp_triggers like `app dispplay name`
+4. Scope the app to the smart group and set it to automatically deploy.
+
+Munki setup:
+
+1. Duplicate and rename VPP_TEMPLATE.plist
+2. Find and replace all occurrences of `FindAndReplaceAllWithAppName` with the app's display name you copied from Jamf above.
+3. Find and edit all instances of `vpp_list_dir = '/usr/local/company_name/config'`
+4. Edit the name key in line 53
+5. Edit the catalog in line 9 if needed
+6. Import the new pkginfo file to your munki repo
+7. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
 
 ### Use IDP Groups as Munki Conditions
 
@@ -162,7 +163,7 @@ For this to work, the enrolled users usernames on your devices in the Jamf conso
         }
         ```
 
-    3. Under PreferenceDomain Properties paste `$USERNAME` in the Username field
+    3. Under PreferenceDomain Properties enter `$USERNAME` in the Username field
 2. Add `run_asUser.sh` into Jamf scripts
     1. Suggested name: `Run asUser Policies as Enrolled User`
     2. Edit the preference domain in line 3
@@ -178,31 +179,31 @@ For this to work, the enrolled users usernames on your devices in the Jamf conso
         - Optionally: Login and Custom - `runAsUser`
     3. Frequency: Ongoing
 
-### vpp-wrangler
+### Zookeeper.py
 
-All of the scripts here except the ea script are part of the VPP_TEMPLATE.plist.
-You can use the template to creat pkginfo files for vpp apps to be offered in MSC and delivered via VPP. Basically, when a user chooses to install a vpp app in MSC, munki will write the app name to a plist. Jamf will read the list of vpp apps into an ea, which is used to create smartgroups scoped to deploy the app.
+This is an easy way to get started using Munki with Jamf, especially if you've just setup your first munki repo. You can get started with this without setting up any manifests in your munki repo (you will need installers, and catalogs though).
 
-Jamf setup:
+Zookeeper's basic function is to add or remove items from any valid section (`['managed_installs', 'managed_uninstalls', 'optional_installs', 'managed_updates']`) of a client's local manifest.
 
-1. Create a new EA with vpp_triggers_ea.py
-2. Copy the display name of an App Store app from the Mac Apps section of your console
-3. Create a smart group with the criteria: vpp_triggers like `app dispplay name`
-4. Scope the app to the smart group and set it to automatically deploy.
+With the other tools below, we've mostly stopped relying on this script altogether, but it was an essential stepping stone to help figure out how to fit both tools into our environment and get the most out of them. It let us start with a single unimportant app to get a feel for things before we moved to a manifest based approach leveraging a single standard manifest for most of our fleet with a lot of conditional included manifests that fuction very similarly to smart groups. It's still a good script to keep around to use in a pinch.
 
-Munki setup:
+Setup script in Jamf:
 
-1. Duplicate and rename VPP_TEMPLATE.plist
-2. Find and replace all occurrences of `FindAndReplaceAllWithAppName` with the app's display name you copied from Jamf above.
-3. Find and edit all instances of `vpp_list_dir = '/usr/local/company_name/config'`
-4. Edit the name key in line 53
-5. Edit the catalog in line 9 if needed
-6. Import the new pkginfo file to your munki repo
-7. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
+1. Copy the script to your jamf instance.
+2. Set parameter labels
+    1. Parameter 4: `Section.Action (Action must be *add* or *remove*)`
+    2. Parameter 5: `Items (One or more separated by commas)`
+    3. Parameter 11: `Force Mode`
+
+Use in profiles:
+
+1. Add zookeeper script to a profile
+2. In parameter 4, add the manifests section and action. Example: `managed_installs.add`
+3. In parameter 5 add the name of the item(s) exactly as it appears in the name key in its pkginfo file.
 
 ## Background
 
-This project started as an attempt to use the best parts of Munki and Jamf and originallly focused on a script to use in Jamf policies to manage items in a device's local manifest in a very similar manner to JamJar, but with different intentions. The original goal was basically to use Munki for all software installs without server-side manifests, controling everything via local manifests managed by Jamf. Ignoring server-side manifests turned out to be a huge mistake, so the project pivoted to these new tools to make it easy to expose data from jamf to munki for conditional items and manifests.
+This project started as an attempt to use the best parts of Munki and Jamf and originally focused on a script to use in Jamf policies to manage items in a device's local manifest in a very similar manner to JamJar, but with slightly different intentions. The original goal was basically to use Munki for all software installs without server-side manifests, controling everything via local manifests managed by Jamf. After some R&D, and some helpful guidance from the MacAdmin's Slack munki channel, ignoring server-side manifests turned out to be a huge mistake, so the project pivoted to these new tools to make it easy to expose data from jamf to munki for conditional items and manifests.
 
 This let's you take full advantage of everything munki has to offer and reduce clutter in users' self help options by separating software installs in MSC from company resources and support in Self-Service.
 
