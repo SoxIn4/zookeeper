@@ -58,6 +58,12 @@ Munki setup:
 6. Import the new pkginfo file to your munki repo
 7. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
 
+### await_profiles
+
+Install this on your clients. When run, typically by a LaunchDaemon added witha proflie_trigger, it will wait for the profiles passed to it and then delete the filename listed at the end from the /Library/LaunchDeamons folder.
+
+__Usage__: `await_profiles.sh <profile_name1> <profile_name2> ... <profile_nameN> <LD_to_delete>`
+
 ### Use IDP Groups as Munki Conditions
 
 Using IDP group memberships as conditions in Munki requires:
