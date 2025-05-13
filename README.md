@@ -27,8 +27,8 @@ Setup script in Jamf:
 1. Copy the script to your jamf instance.
 1. Edit Lines 13 and 17 to fit `CONFIGDIR` and `FILES` to your environment and needs
 1. Set parameter labels
-    2. Parameter 4: `File.Section.Action (Action must be *add* or *remove*)`
-    2. Parameter 5: `Value (One or more separated by commas)`
+    1. Parameter 4: `File.Section.Action (Action must be *add* or *remove*)`
+    1. Parameter 5: `Value (One or more separated by commas)`
 
 Use in profiles:
 
@@ -88,47 +88,47 @@ Install munki-facts on your clients with idp_groups_fact.py in their munki-facts
 #### Jamf
 
 1. Create a new EA with idp_groups_ea.py
-    2. Suggested name: `IDP Groups`
-    2. Edit `group_list_dir` at line 13
-2. Make EA smart group
-    2. Name: `IDP Groups - <paste_group_name>`
-    2. Criteria: `IDP Groups like <paste_group_name>`
+    1. Suggested name: `IDP Groups`
+    1. Edit `group_list_dir` at line 13
+1. Make EA smart group
+    1. Name: `IDP Groups - <paste_group_name>`
+    1. Criteria: `IDP Groups like <paste_group_name>`
 1. Make Write group name policy
-    2. Name: `Add Group - <paste_group_name>`
-    2. Trigger
+    1. Name: `Add Group - <paste_group_name>`
+    1. Trigger
         - If local and IDP usernames match: Recurring Check-in
         - If local and IDP usernames __don't__ match: Custom - `asUser`*
-    2. Frequency: Ongoing
-    2. Add script: Edit Config Values
-        3. File.Section.Action: `groups.idp_groups.add`
-        3. Items: `<paste_group_name>`
-    2. Scope
-        3. Target All Computers, Specific Users
-        3. Limitations
-            4. Add Directory Service Group
-            4. <paste_group_name> in search field
-            4. Select correct group and click done
-        3. Exclusions
-            4. Add smart group created in step 2
-    2. Add Maintenance - Update Inventory
+    1. Frequency: Ongoing
+    1. Add script: Edit Config Values
+        1. File.Section.Action: `groups.idp_groups.add`
+        1. Items: `<paste_group_name>`
+    1. Scope
+        1. Target All Computers, Specific Users
+        1. Limitations
+            1. Add Directory Service Group
+            1. <paste_group_name> in search field
+            1. Select correct group and click done
+        1. Exclusions
+            1. Add smart group created in step 2
+    1. Add Maintenance - Update Inventory
 1. Make Removal policy
-    2. Name: `Remove Group - <paste_group_name>`
-    2. Trigger
+    1. Name: `Remove Group - <paste_group_name>`
+    1. Trigger
         - If local and IDP usernames match: Recurring Check-in
         - If local and IDP usernames __don't__ match: Custom - `asUser`*
-    2. Frequency: Ongoing
-    2. Add script: Edit Config Values
-        3. File.Section.Action: `groups.idp_groups.remove`
-        3. Items: `<paste_group_name>`
-    2. Scope
-        3. Target Specific Computers, All Users
+    1. Frequency: Ongoing
+    1. Add script: Edit Config Values
+        1. File.Section.Action: `groups.idp_groups.remove`
+        1. Items: `<paste_group_name>`
+    1. Scope
+        1. Target Specific Computers, All Users
             - Add smart group created in step 2
-        3. Limitations - None
-        3. Exclusions
-            4. Add Directory Service Group
-            4. <paste_group_name> in search field
-            4. Select correct group and click done
-    2. Add Maintenance - Update Inventory
+        1. Limitations - None
+        1. Exclusions
+            1. Add Directory Service Group
+            1. <paste_group_name> in search field
+            1. Select correct group and click done
+    1. Add Maintenance - Update Inventory
 
 #### Munki
 
@@ -151,10 +151,10 @@ For this to work, the enrolled users usernames on your devices in the Jamf conso
 ```
 
 1. Deploy a profile with the Jamf Username
-    2. Name: `Company_Name Automation Data` (you may want to add properties to this for other uses, and if you have a similar profile already, you can use that instead.)
-    2. Add External Application Payload
-        3. Preference domain: `com.company_name.automation.info`
-        3. Add custom schema:
+    1. Name: `Company_Name Automation Data` (you may want to add properties to this for other uses, and if you have a similar profile already, you can use that instead.)
+    1. Add External Application Payload
+        1. Preference domain: `com.company_name.automation.info`
+        1. Add custom schema:
 
         ```json
         {
@@ -171,21 +171,21 @@ For this to work, the enrolled users usernames on your devices in the Jamf conso
         }
         ```
 
-    2. Under PreferenceDomain Properties enter `$USERNAME` in the Username field
+    1. Under PreferenceDomain Properties enter `$USERNAME` in the Username field
 1. Add `run_asUser.sh` into Jamf scripts
-    2. Suggested name: `Run asUser Policies as Enrolled User`
-    2. Edit the preference domain in line 3
+    1. Suggested name: `Run asUser Policies as Enrolled User`
+    1. Edit the preference domain in line 3
 
     ```text
     This script will run on every check-in and run `jamf policy -event asUser -username` with the username in the profile to run the policies with the asUSer custom event trigger
     ```
 
 1. Create Policy
-    2. Name `Run Jamf Policies As Enrolled User`
-    2. Trigger
+    1. Name `Run Jamf Policies As Enrolled User`
+    1. Trigger
         - Recurring Check-in
         - Optionally: Login and Custom - `runAsUser`
-    2. Frequency: Ongoing
+    1. Frequency: Ongoing
 
 ### Zookeeper.py
 
@@ -199,9 +199,9 @@ Setup script in Jamf:
 
 1. Copy the script to your jamf instance.
 1. Set parameter labels
-    2. Parameter 4: `Section.Action (Action must be *add* or *remove*)`
-    2. Parameter 5: `Items (One or more separated by commas)`
-    2. Parameter 11: `Force Mode`
+    1. Parameter 4: `Section.Action (Action must be *add* or *remove*)`
+    1. Parameter 5: `Items (One or more separated by commas)`
+    1. Parameter 11: `Force Mode`
 
 Use in profiles:
 
