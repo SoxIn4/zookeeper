@@ -58,11 +58,46 @@ Munki setup:
 1. Import the new pkginfo file to your munki repo
 1. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
 
+### profile_triggers
+
+Sometimes you may need one or more profiles to be installed to a device for an app prior to its installation, and for optional apps, you might not want to pre-deploy those profiles to all devices that might install the app. The files here allow you to let users choose an app from MSC to trigger your MDM. It's currently written for jamf, but should work with several other MDM's with minor modifications. I'd love to discuss how it could work with othe MDM's here via issues, or in Slack (@SoxIn4).
+
+#### How it works
+
+The pkginfo template will create the item (APPNAME-Trigger) that will be available to users in MSC. When they install it, it will write a tag to a plist and write and load a LaunchDaemon (see Example_LD) to run the await_profiles script. Your postflight sctipt will trigger a jamf recon, updatinig an EA reading the tag from the plist, putting the device into a smartgroup which triggers the profile deployment. The await_profiles script will be running in the background, and when it sees the profiles (usually about 10 seconds after the initial munki run and recon) it triggers another munki run to install the app. If your MDM is fast, the MSC UI updates with the additional run seconds after the first, so the ux is still pretty good.
+
+#### Client setup
+
+Deploy await_profiles (below) to `/usr/local/zookeeper/await_profiles.sh`
+
+#### Munki setup
+
+```text
+Requires munki-facts:
+
+Install munki-facts on your clients with installed_profiles_fact.py in their munki-facts facts directory.
+```
+
+1. Duplicate and rename PROFILE_TRIGGER_TEMPLATE.plist
+1. Find and replace all occurrences of `APPNAME` with  whatever is appropriate. The resulting item name in your repo will have `-Trigger` appended.
+1. Find and replace all occurrences of `DISPLAYNAME` with whatever is appropriate.
+1. Edit the version in line 21.
+1. Edit the **required profile names** in line 84
+1. Edit other properties as needed.
+1. Import the new pkginfo file to your munki repo.
+1. Add `APPNAME-Trigger` to a device's manifest.
+1. Add the actual app you want to deploy after the profiles as a `managed_install`, conditional on the profiles being present, to the device's manifest.
+
+#### Jamf setup
+
+1. Create a new EA with profile_triggers_ea.py
+1. Create a smart group with the criteria: proflie_triggers like `APPNAME` (from step 2 of munki setup above)
+1. Scope the required profiles to the smart group and set them to automatically deploy.
+
 ### await_profiles
 
-Install this on your clients. When run, typically by a LaunchDaemon added witha proflie_trigger, it will wait for the profiles passed to it and then delete the filename listed at the end from the /Library/LaunchDeamons folder.
+Install this on your clients. When run, typically by a LaunchDaemon added with a ***proflie_trigger***, it will wait for the profiles passed to it, then run `managedsoftwareupdate --auto` ,and finally delete the filename listed at the end from the /Library/LaunchDeamons folder.
 
-__Usage__: `await_profiles.sh <profile_name1> <profile_name2> ... <profile_nameN> <LD_to_delete>`
 **Usage**: `await_profiles.sh <profile_name1> <profile_name2> ... <profile_nameN> <LD_to_delete>`
 
 ### Use IDP Groups as Munki Conditions

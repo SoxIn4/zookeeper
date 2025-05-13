@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>soxin4</string>
+		<key>creation_date</key>
+		<date>2023-10-24T21:10:19Z</date>
+		<key>munki_version</key>
+		<string>6.3.3.4593</string>
+		<key>os_version</key>
+		<string>14.0</string>
+	</dict>
+	<key>name</key>
+	<string>APPNAME-Trigger</string>
+	<key>display_name</key>
+	<string>DISPLAYNAME</string>
+	<key>version</key>
+	<string>x.y.z</string>
+	<key>icon_name</key>
+	<string></string>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array/>
+	<key>category</key>
+	<string></string>
+	<key>description</key>
+	<string></string>
+	<key>developer</key>
+	<string></string>
+	<key>unattended_install</key>
+	<false/>
+	<key>unattended_uninstall</key>
+	<false/>
+	<key>minimum_os_version</key>
+	<string>10.15</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/local/munki/munki-python
+import os
+import sys
+
+sys.path.append('/usr/local/munki')
+try:
+    from munkilib import FoundationPlist
+except ImportError:
+    print('ERROR: Cannot import FoundationPlist')
+    sys.exit(1)
+
+
+target = 'APPNAME'
+trigger_list_dir = '/usr/local/zookeeper/config'
+trigger_list_name = 'profile_triggers'
+trigger_list_path = f'{trigger_list_dir}/{trigger_list_name}.plist'
+
+if os.path.exists(trigger_list_path):
+    try:
+        triggers_plist =  FoundationPlist.readPlist(trigger_list_path)
+    except FoundationPlist.NSPropertyListSerializationException:
+        print(f'ERROR: Cannot read {trigger_list_path}')
+        sys.exit(1)
+
+    triggers = triggers_plist.get('triggers', [])
+    if target in triggers:
+        print(f'{target} is already in the triggers list, nothing to do')
+        sys.exit(1)
+
+print(f'{target} is not in profile_triggers yet')
+sys.exit(0)
+</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>postinstall_script</key>
+	<string>#!/usr/local/munki/munki-python
+import os
+import subprocess
+import sys
+
+target = 'APPNAME'
+await_profile_label = "com.zookeeper.await_profiles.APPNAME"
+zookeeper_path = "/usr/local/zookeeper"
+profile_names = ['Profile Name 1', 'Profile Name 2']
+
+sys.path.append('/usr/local/munki')
+try:
+    from munkilib import FoundationPlist
+except ImportError:
+    print('ERROR: Cannot import FoundationPlist')
+    sys.exit(1)
+
+trigger_list_name = 'profile_triggers'
+trigger_list_path = f'{zookeeper_path}/config/{trigger_list_name}.plist'
+triggers_plist = None
+
+if os.path.exists(trigger_list_path):
+    try:
+        triggers_plist =  FoundationPlist.readPlist(trigger_list_path)
+        if target in triggers_plist.get('triggers', []):
+            print(f'{target} is already in the profile_triggers list, nothing to do')
+            sys.exit(0)
+        else:
+            triggers_plist['triggers'].append(target)
+    except FoundationPlist.NSPropertyListSerializationException:
+        print(f'ERROR: Cannot read {trigger_list_path}')
+        sys.exit(1)
+
+if not triggers_plist:
+    triggers_plist = {'triggers': [target]}
+
+if not os.path.exists(f'{zookeeper_path}/config'):
+    os.makedirs(f'{zookeeper_path}/config')
+FoundationPlist.writePlist(triggers_plist, trigger_list_path)
+print(f'{target} added to profile_triggers list at {trigger_list_path}')
+
+
+ld_plist = f"/Library/LaunchDaemons/{await_profile_label}.plist"
+ld_data = {'Label': await_profile_label,
+           'ProgramArguments': [f'{zookeeper_path}/scripts/await_profiles.sh'] + profile_names + [f'{await_profile_label}'],
+           'StandardOutPath': '/Library/Managed Installs/Logs/ManagedSoftwareUpdate.log',
+           'StandardErrorPath': '/Library/Managed Installs/Logs/ManagedSoftwareUpdate.log',
+           'RunAtLoad': True,
+           'KeepAlive': True,
+           'AbandonProcessGroup': True
+           }
+
+FoundationPlist.writePlist(ld_data, ld_plist)
+
+chmod = ['chmod', '644', ld_plist]
+result = subprocess.call(chmod)
+chown = ['chown', 'root:wheel', ld_plist]
+result = subprocess.call(chown)
+bootstrap = ['launchctl', 'bootstrap', 'system', ld_plist]
+result = subprocess.call(bootstrap)
+</string>
+	<key>postuninstall_script</key>
+	<string></string>
+	<key>preinstall_alert</key>
+	<dict>
+		<key>alert_detail</key>
+		<string>DISPLAYNAME needs some profiles applied to your device before it can install. 
+		After the initial installation is complete, your device will wait for the profiles to arrive and triggger the app installation.
+		This will usually just take a few seconds, but may take several minutes.</string>
+		<key>alert_title</key>
+		<string>DISPLAYNAME Install</string>
+	</dict>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/usr/local/munki/munki-python
+import os
+import sys
+
+sys.path.append('/usr/local/munki')
+try:
+    from munkilib import FoundationPlist
+except ImportError:
+    print('ERROR: Cannot import FoundationPlist')
+    sys.exit(1)
+
+
+target = 'APPNAME'
+triggers_list_dir = '/usr/local/zookeeper/config'
+triggers_list_name = 'profile_triggers'
+triggers_list_path = f'{triggers_list_dir}/{triggers_list_name}.plist'
+
+if os.path.exists(triggers_list_path):
+    try:
+        triggers_plist =  FoundationPlist.readPlist(triggers_list_path)
+    except FoundationPlist.NSPropertyListSerializationException:
+        print(f'ERROR: Cannot read {triggers_list_path}')
+        sys.exit(1)
+
+    if target in triggers_plist.get('triggers', []):
+        triggers_plist['triggers'].remove(target)
+        FoundationPlist.writePlist(triggers_plist, triggers_list_path)
+        print(f'{target} removed from {triggers_list_path}')
+        sys.exit(0)
+   
+print(f'{target} not in {triggers_list_path}, nothing to do')
+</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>uninstallcheck_script</key>
+	<string></string>
+</dict>
+</plist>

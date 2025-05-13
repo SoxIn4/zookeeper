@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.zookeeper.await_profiles.app_name.plist</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/zookeeper/config/await_profiles.sh</string>
+		<string>Profile Name 1</string>
+		<string>Profile Name 2</string>
+		<string>com.zookeeper.await_profiles.app_name.plist</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+</dict>
+</plist>
