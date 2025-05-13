@@ -63,6 +63,7 @@ Munki setup:
 Install this on your clients. When run, typically by a LaunchDaemon added witha proflie_trigger, it will wait for the profiles passed to it and then delete the filename listed at the end from the /Library/LaunchDeamons folder.
 
 __Usage__: `await_profiles.sh <profile_name1> <profile_name2> ... <profile_nameN> <LD_to_delete>`
+**Usage**: `await_profiles.sh <profile_name1> <profile_name2> ... <profile_nameN> <LD_to_delete>`
 
 ### Use IDP Groups as Munki Conditions
 
@@ -97,7 +98,7 @@ Install munki-facts on your clients with idp_groups_fact.py in their munki-facts
     1. Name: `Add Group - <paste_group_name>`
     1. Trigger
         - If local and IDP usernames match: Recurring Check-in
-        - If local and IDP usernames __don't__ match: Custom - `asUser`*
+        - If local and IDP usernames **don't** match: Custom - `asUser`*
     1. Frequency: Ongoing
     1. Add script: Edit Config Values
         1. File.Section.Action: `groups.idp_groups.add`
@@ -115,7 +116,7 @@ Install munki-facts on your clients with idp_groups_fact.py in their munki-facts
     1. Name: `Remove Group - <paste_group_name>`
     1. Trigger
         - If local and IDP usernames match: Recurring Check-in
-        - If local and IDP usernames __don't__ match: Custom - `asUser`*
+        - If local and IDP usernames **don't** match: Custom - `asUser`*
     1. Frequency: Ongoing
     1. Add script: Edit Config Values
         1. File.Section.Action: `groups.idp_groups.remove`
