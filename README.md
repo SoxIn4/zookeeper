@@ -20,7 +20,7 @@ It will run a jamf recon whenever munki has installed or removed anything to kee
 
 ### edit_config_values.py
 
-This is probably the most useful script here. Combined with munki_postflight_recon, it opens a lot of possibilities. It was written initially to support IDP groups, but quickly evolved to serve more use cases. It basically just writes values to plists, and functions very similarly to the zookeeper.py script.
+This is probably the most useful script here. Combined with munki_postflight_recon, it opens a lot of possibilities. It was written initially to support IDP groups, but quickly evolved to serve more use cases. It basically just writes values to plists, and functions very similarly to the zookeeper.py script. Paired with a fact for munki-facts (see idp_groups_fact.py for an example) to read the values, you can use them as conditions in manifests. We maintain a groups file with sections for our IDP and other systems, and a tags file with sections jamf and other tools.
 
 Setup script in Jamf:
 
