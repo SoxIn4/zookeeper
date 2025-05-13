@@ -25,16 +25,16 @@ This is probably the most useful script here. Combined with munki_postflight_rec
 Setup script in Jamf:
 
 1. Copy the script to your jamf instance.
-2. Edit Lines 13 and 17 to fit `CONFIGDIR` and `FILES` to your environment and needs
-3. Set parameter labels
-    1. Parameter 4: `File.Section.Action (Action must be *add* or *remove*)`
+1. Edit Lines 13 and 17 to fit `CONFIGDIR` and `FILES` to your environment and needs
+1. Set parameter labels
+    2. Parameter 4: `File.Section.Action (Action must be *add* or *remove*)`
     2. Parameter 5: `Value (One or more separated by commas)`
 
 Use in profiles:
 
 1. Add edit_config_values script to a profile
-2. In parameter 4, add the file, section, and action. Example: `tags.device_tags.add`
-3. In parameter 5 add the value(s). Example: `Tag1, Tag 2, Tag_3`
+1. In parameter 4, add the file, section, and action. Example: `tags.device_tags.add`
+1. In parameter 5 add the value(s). Example: `Tag1, Tag 2, Tag_3`
 
 ### vpp-wrangler
 
@@ -44,19 +44,19 @@ You can use the template to creat pkginfo files for vpp apps to be offered in MS
 Jamf setup:
 
 1. Create a new EA with vpp_triggers_ea.py
-2. Copy the display name of an App Store app from the Mac Apps section of your console
-3. Create a smart group with the criteria: vpp_triggers like `app dispplay name`
-4. Scope the app to the smart group and set it to automatically deploy.
+1. Copy the display name of an App Store app from the Mac Apps section of your console
+1. Create a smart group with the criteria: vpp_triggers like `app dispplay name`
+1. Scope the app to the smart group and set it to automatically deploy.
 
 Munki setup:
 
 1. Duplicate and rename VPP_TEMPLATE.plist
-2. Find and replace all occurrences of `APPNAME` with the app's display name you copied from Jamf above.
-3. Find and edit all instances of `vpp_list_dir = '/usr/local/company_name/config'`
-4. Edit the name key in line 21
-5. Add a catalog(s) at line 19 if needed
-6. Import the new pkginfo file to your munki repo
-7. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
+1. Find and replace all occurrences of `APPNAME` with the app's display name you copied from Jamf above.
+1. Find and edit all instances of `vpp_list_dir = '/usr/local/company_name/config'`
+1. Edit the name key in line 21
+1. Add a catalog(s) at line 19 if needed
+1. Import the new pkginfo file to your munki repo
+1. Using the name from step 3, add it to `optional_installs` or `default_installs` in mainfests in your repo, or use zookeeper.py to add it to local manifests.
 
 ### await_profiles
 
@@ -88,47 +88,47 @@ Install munki-facts on your clients with idp_groups_fact.py in their munki-facts
 #### Jamf
 
 1. Create a new EA with idp_groups_ea.py
-    1. Suggested name: `IDP Groups`
+    2. Suggested name: `IDP Groups`
     2. Edit `group_list_dir` at line 13
 2. Make EA smart group
-    1. Name: `IDP Groups - <paste_group_name>`
+    2. Name: `IDP Groups - <paste_group_name>`
     2. Criteria: `IDP Groups like <paste_group_name>`
-3. Make Write group name policy
-    1. Name: `Add Group - <paste_group_name>`
+1. Make Write group name policy
+    2. Name: `Add Group - <paste_group_name>`
     2. Trigger
         - If local and IDP usernames match: Recurring Check-in
         - If local and IDP usernames __don't__ match: Custom - `asUser`*
-    3. Frequency: Ongoing
-    4. Add script: Edit Config Values
-        1. File.Section.Action: `groups.idp_groups.add`
-        2. Items: `<paste_group_name>`
-    5. Scope
-        1. Target All Computers, Specific Users
-        2. Limitations
-            1. Add Directory Service Group
-            2. <paste_group_name> in search field
-            3. Select correct group and click done
+    2. Frequency: Ongoing
+    2. Add script: Edit Config Values
+        3. File.Section.Action: `groups.idp_groups.add`
+        3. Items: `<paste_group_name>`
+    2. Scope
+        3. Target All Computers, Specific Users
+        3. Limitations
+            4. Add Directory Service Group
+            4. <paste_group_name> in search field
+            4. Select correct group and click done
         3. Exclusions
-            1. Add smart group created in step 2
-    6. Add Maintenance - Update Inventory
-4. Make Removal policy
-    1. Name: `Remove Group - <paste_group_name>`
+            4. Add smart group created in step 2
+    2. Add Maintenance - Update Inventory
+1. Make Removal policy
+    2. Name: `Remove Group - <paste_group_name>`
     2. Trigger
         - If local and IDP usernames match: Recurring Check-in
         - If local and IDP usernames __don't__ match: Custom - `asUser`*
-    3. Frequency: Ongoing
-    4. Add script: Edit Config Values
-        1. File.Section.Action: `groups.idp_groups.remove`
-        2. Items: `<paste_group_name>`
-    5. Scope
-        1. Target Specific Computers, All Users
-            1. Add smart group created in step 2
-        2. Limitations - None
+    2. Frequency: Ongoing
+    2. Add script: Edit Config Values
+        3. File.Section.Action: `groups.idp_groups.remove`
+        3. Items: `<paste_group_name>`
+    2. Scope
+        3. Target Specific Computers, All Users
+            - Add smart group created in step 2
+        3. Limitations - None
         3. Exclusions
-            1. Add Directory Service Group
-            2. <paste_group_name> in search field
-            3. Select correct group and click done
-    6. Add Maintenance - Update Inventory
+            4. Add Directory Service Group
+            4. <paste_group_name> in search field
+            4. Select correct group and click done
+    2. Add Maintenance - Update Inventory
 
 #### Munki
 
@@ -151,10 +151,10 @@ For this to work, the enrolled users usernames on your devices in the Jamf conso
 ```
 
 1. Deploy a profile with the Jamf Username
-    1. Name: `Company_Name Automation Data` (you may want to add properties to this for other uses, and if you have a similar profile already, you can use that instead.)
+    2. Name: `Company_Name Automation Data` (you may want to add properties to this for other uses, and if you have a similar profile already, you can use that instead.)
     2. Add External Application Payload
-        1. Preference domain: `com.company_name.automation.info`
-        2. Add custom schema:
+        3. Preference domain: `com.company_name.automation.info`
+        3. Add custom schema:
 
         ```json
         {
@@ -171,21 +171,21 @@ For this to work, the enrolled users usernames on your devices in the Jamf conso
         }
         ```
 
-    3. Under PreferenceDomain Properties enter `$USERNAME` in the Username field
-2. Add `run_asUser.sh` into Jamf scripts
-    1. Suggested name: `Run asUser Policies as Enrolled User`
+    2. Under PreferenceDomain Properties enter `$USERNAME` in the Username field
+1. Add `run_asUser.sh` into Jamf scripts
+    2. Suggested name: `Run asUser Policies as Enrolled User`
     2. Edit the preference domain in line 3
 
     ```text
     This script will run on every check-in and run `jamf policy -event asUser -username` with the username in the profile to run the policies with the asUSer custom event trigger
     ```
 
-3. Create Policy
-    1. Name `Run Jamf Policies As Enrolled User`
+1. Create Policy
+    2. Name `Run Jamf Policies As Enrolled User`
     2. Trigger
         - Recurring Check-in
         - Optionally: Login and Custom - `runAsUser`
-    3. Frequency: Ongoing
+    2. Frequency: Ongoing
 
 ### Zookeeper.py
 
@@ -198,16 +198,16 @@ With the other tools below, we've mostly stopped relying on this script altogeth
 Setup script in Jamf:
 
 1. Copy the script to your jamf instance.
-2. Set parameter labels
-    1. Parameter 4: `Section.Action (Action must be *add* or *remove*)`
+1. Set parameter labels
+    2. Parameter 4: `Section.Action (Action must be *add* or *remove*)`
     2. Parameter 5: `Items (One or more separated by commas)`
-    3. Parameter 11: `Force Mode`
+    2. Parameter 11: `Force Mode`
 
 Use in profiles:
 
 1. Add zookeeper script to a profile
-2. In parameter 4, add the manifests section and action. Example: `managed_installs.add`
-3. In parameter 5 add the name of the item(s) exactly as it appears in the name key in its pkginfo file.
+1. In parameter 4, add the manifests section and action. Example: `managed_installs.add`
+1. In parameter 5 add the name of the item(s) exactly as it appears in the name key in its pkginfo file.
 
 ## Background
 
