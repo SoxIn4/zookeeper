@@ -12,7 +12,7 @@ except ImportError:
     sys.exit(1)
 
 # Set a path to store the plists
-CONFGDIR = '/usr/local/company_name/config'
+CONFGDIR = '/usr/local/zookeeper/config'
 
 # Define the files and sections to be edited
 # The keys in the FILES dictionary are the plist filenames

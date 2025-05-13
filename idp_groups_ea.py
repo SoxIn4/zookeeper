@@ -10,7 +10,7 @@ except ImportError:
     sys.exit(1)
 
 # Edit path for your environment
-group_list_dir = '/usr/local/company_name/config'
+group_list_dir = '/usr/local/zookeeper/config'
 
 # Edit name of file with idp_groups
 group_list_name = 'groups'

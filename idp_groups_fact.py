@@ -13,20 +13,20 @@ except ImportError:
     sys.exit(1)
 
 # Edit path for your environment
-group_list_dir = '/usr/local/company_name/config'
+group_list_dir = '/usr/local/zookeeper/config'
 
 def fact():
-    '''Return the list of entra groups for the JAMF enrolled user'''
+    '''Return the list of IDP groups for the JAMF enrolled user'''
     return {'idp_groups': get_idp_groups()}
 
 def get_idp_groups():
-    """Read groups from /usr/local/matw/config/groups.plist."""
+    """Read groups from /usr/local/zookeeper/config/groups.plist."""
     group_list_name = 'groups'
     group_list_path = f'{group_list_dir}/{group_list_name}.plist'
 
     if os.path.exists(group_list_path):
         try:
-            groups_plist =  FoundationPlist.readPlist(group_list_path)
+            groups_plist = FoundationPlist.readPlist(group_list_path)
         except FoundationPlist.NSPropertyListSerializationException:
             print(f'ERROR: Cannot read {group_list_path}')
             sys.exit(1)

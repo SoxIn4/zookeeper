@@ -10,7 +10,7 @@ except ImportError:
     sys.exit(1)
 
 
-vpp_list_dir = '/usr/local/matw/config'
+vpp_list_dir = '/usr/local/zookeeper/config'
 vpp_list_name = 'vpp_apps'
 vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 apps = None

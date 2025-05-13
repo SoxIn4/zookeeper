@@ -39,7 +39,7 @@ except ImportError:
 
 
 target = 'APPNAME'
-vpp_list_dir = '/usr/local/company_name/config'
+vpp_list_dir = '/usr/local/zookeeper/config'
 vpp_list_name = 'vpp_apps'
 vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 
@@ -76,7 +76,7 @@ except ImportError:
 
 
 target = 'APPNAME'
-vpp_list_dir = '/usr/local/company_name/config'
+vpp_list_dir = '/usr/local/zookeeper/config'
 vpp_list_name = 'vpp_apps'
 vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 vpp_apps_plist = None
@@ -141,7 +141,7 @@ except ImportError:
 
 
 target = 'APPNAME'
-vpp_list_dir = '/usr/local/company_name/config'
+vpp_list_dir = '/usr/local/zookeeper/config'
 vpp_list_name = 'vpp_apps'
 vpp_list_path = f'{vpp_list_dir}/{vpp_list_name}.plist'
 
